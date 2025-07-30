@@ -1,0 +1,50 @@
+```
+To add a "Save Records" button that allows users to download their current shot data as a .json file, follow these steps:
+
+✅ 1. Add the Button to HTML
+Update your index.html inside the .buttons section:
+
+html
+
+<button id="saveBtn">Save Records</button>
+
+Now your buttons section should look like:
+
+html
+
+<div class="buttons">
+  <button id="madeBtn" aria-label="Log a made shot">Made Shot</button>
+  <button id="missedBtn" aria-label="Log a missed shot">Missed Shot</button>
+  <button id="resetBtn">Reset Tracker</button>
+  <button id="saveBtn">Save Records</button>
+</div>
+
+✅ 2. Add the Save Logic in script.js
+At the top, cache the new button:
+
+js
+
+const saveBtn = document.getElementById('saveBtn');
+Then add this event listener:
+
+js
+
+saveBtn.addEventListener('click', () => {
+  const dataStr = JSON.stringify(shotData, null, 2); // formatted JSON
+  const blob = new Blob([dataStr], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `basketball_shot_data_${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+
+  URL.revokeObjectURL(url);
+});
+
+✅ Result
+Clicking the Save Records button will download the current stats, streaks, and history as a .json file like:
+
+pgsql
+
+basketball_shot_data_2025-07-30.json
