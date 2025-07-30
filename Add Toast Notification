@@ -1,0 +1,73 @@
+Add Toast Notification Instead of Alert Boxes
+
+🔧 Update index.html — Add this just before the </body> tag:
+
+html
+
+<div id="toast" class="toast"></div>
+
+🎨 Update styles.css — Add this at the bottom:
+
+css
+
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 6px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  font-size: 1rem;
+  z-index: 9999;
+}
+
+.toast.show {
+  opacity: 0.9;
+  pointer-events: auto;
+}
+
+🧠 In script.js, add this function:
+
+js
+
+function showToast(message) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.classList.add('show');
+
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3000);
+}
+
+💡 Replace alert boxes with toasts:
+In the load logic:
+
+js
+
+showToast("Shot records successfully loaded.");
+showTimestamp("Loaded");
+
+In the save logic:
+
+js
+
+showToast("Shot records saved.");
+showTimestamp("Saved");
+
+In the load error handling:
+
+js
+
+showToast("Failed to load data.");
+
+In the validation failure:
+
+js
+
+showToast("Invalid data format.");
