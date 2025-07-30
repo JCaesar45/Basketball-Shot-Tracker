@@ -1,0 +1,43 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Basketball Shot Tracker</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <h1>Basketball Shot Tracker</h1>
+
+  <div class="buttons">
+    <button id="madeBtn" aria-label="Log a made shot">Made Shot</button>
+    <button id="missedBtn" aria-label="Log a missed shot">Missed Shot</button>
+    <button id="resetBtn">Reset Tracker</button>
+  </div>
+
+  <div class="filter-section">
+    <label for="filter">Filter:</label>
+    <select id="filter">
+      <option value="all">All Time</option>
+      <option value="day">Today</option>
+      <option value="week">This Week</option>
+    </select>
+  </div>
+
+  <div class="stats">
+    <p>Total Shots: <span id="totalShots">0</span></p>
+    <p>Made Shots: <span id="madeShots">0</span></p>
+    <p>Shooting Percentage: <span id="percentage">0%</span></p>
+    <p>Current Streak: <span id="currentStreak">0</span></p>
+    <p>Best Streak: <span id="bestStreak">0</span></p>
+  </div>
+
+  <h2>Shot History</h2>
+  <ul id="shotHistory"></ul>
+
+  <h2>Shooting Percentage Over Time</h2>
+  <canvas id="shotChart" width="400" height="200"></canvas>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
