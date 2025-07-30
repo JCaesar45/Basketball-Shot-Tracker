@@ -1,0 +1,34 @@
+✅ 1. Show Timestamp of Last Save/Load
+🔧 Update index.html
+Add this below the .stats section:
+
+html
+
+<div class="last-action" id="lastAction"></div>
+
+🧠 In script.js, cache the element:
+js
+
+const lastActionEl = document.getElementById('lastAction');
+
+🔁 Add this function:
+
+js
+
+function showTimestamp(message) {
+  const now = new Date().toLocaleString();
+  lastActionEl.textContent = `${message} at ${now}`;
+}
+
+Call this:
+
+After save:
+
+js
+
+showTimestamp("Saved");
+After successful load:
+
+js
+
+showTimestamp("Loaded");
