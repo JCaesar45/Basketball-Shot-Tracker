@@ -1,0 +1,169 @@
+// Initialize data from local storage or defaults
+let shotData = JSON.parse(localStorage.getItem('shotData')) || {
+  total: 0,
+  made: 0,
+  missed: 0,
+  streak: 0,
+  bestStreak: 0,
+  history: []
+};
+
+// Cache DOM elements
+const totalShotsEl = document.getElementById('totalShots');
+const madeShotsEl = document.getElementById('madeShots');
+const percentageEl = document.getElementById('percentage');
+const currentStreakEl = document.getElementById('currentStreak');
+const bestStreakEl = document.getElementById('bestStreak');
+const shotHistoryEl = document.getElementById('shotHistory');
+const madeBtn = document.getElementById('madeBtn');
+const missedBtn = document.getElementById('missedBtn');
+const resetBtn = document.getElementById('resetBtn');
+const filterSelect = document.getElementById('filter');
+
+// Setup Chart
+const ctx = document.getElementById('shotChart').getContext('2d');
+let chart = new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: [],
+    datasets: [{
+      label: 'Shooting %',
+      data: [],
+      borderColor: 'green',
+      borderWidth: 2,
+      tension: 0.3,
+      fill: false
+    }]
+  },
+  options: {
+    scales: {
+      y: {
+        beginAtZero: true,
+        max: 100
+      }
+    }
+  }
+});
+
+// Event listeners
+madeBtn.addEventListener('click', () => {
+  shotData.total++;
+  shotData.made++;
+  shotData.streak++;
+  if (shotData.streak > shotData.bestStreak) {
+    shotData.bestStreak = shotData.streak;
+  }
+  const entry = { type: 'Made', time: new Date().toLocaleString() };
+  shotData.history.push(entry);
+  flashBackground('#d4edda');
+  updateDisplay();
+});
+
+missedBtn.addEventListener('click', () => {
+  shotData.total++;
+  shotData.missed++;
+  shotData.streak = 0;
+  const entry = { type: 'Missed', time: new Date().toLocaleString() };
+  shotData.history.push(entry);
+  flashBackground('#f8d7da');
+  updateDisplay();
+});
+
+resetBtn.addEventListener('click', () => {
+  if (confirm("Are you sure you want to reset all shot data?")) {
+    shotData = {
+      total: 0,
+      made: 0,
+      missed: 0,
+      streak: 0,
+      bestStreak: 0,
+      history: []
+    };
+    saveData();
+    updateDisplay();
+  }
+});
+
+
+filterSelect.addEventListener('change', updateDisplay);
+
+// Flash background on shot
+function flashBackground(color) {
+  document.body.style.backgroundColor = color;
+  setTimeout(() => {
+    document.body.style.backgroundColor = '#f0f8ff';
+  }, 300);
+}
+
+// Save to local storage
+function saveData() {
+  localStorage.setItem('shotData', JSON.stringify(shotData));
+}
+
+// Filter history by time
+function filterShots() {
+  const now = new Date();
+  return shotData.history.filter(entry => {
+    const shotTime = new Date(entry.time);
+    const filter = filterSelect.value;
+    if (filter === 'day') {
+      return shotTime.toDateString() === now.toDateString();
+    } else if (filter === 'week') {
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(now.getDate() - 7);
+      return shotTime >= oneWeekAgo;
+    }
+    return true;
+  });
+}
+
+// Render shot history
+function renderHistory() {
+  shotHistoryEl.innerHTML = '';
+  const filteredHistory = filterShots();
+  filteredHistory.slice().reverse().forEach((entry) => {
+    const li = document.createElement('li');
+    li.textContent = `${entry.type} at ${entry.time}`;
+    li.setAttribute('tabindex', '0');
+    shotHistoryEl.appendChild(li);
+  });
+}
+
+// Update Chart
+function updateChart() {
+  const history = shotData.history;
+  const labels = [];
+  const data = [];
+  let made = 0;
+
+  history.forEach((entry, i) => {
+    if (entry.type === 'Made') made++;
+    labels.push(i + 1);
+    data.push(((made / (i + 1)) * 100).toFixed(1));
+  });
+
+  chart.data.labels = labels;
+  chart.data.datasets[0].data = data;
+  chart.update();
+}
+
+// Update all displays
+function updateDisplay() {
+  const filteredHistory = filterShots();
+  const filteredMade = filteredHistory.filter(e => e.type === 'Made').length;
+  const filteredTotal = filteredHistory.length;
+  const percent = filteredTotal === 0 ? 0 : ((filteredMade / filteredTotal) * 100).toFixed(1);
+
+  totalShotsEl.textContent = filteredTotal;
+  madeShotsEl.textContent = filteredMade;
+  percentageEl.textContent = `${percent}%`;
+  currentStreakEl.textContent = shotData.streak;
+  bestStreakEl.textContent = shotData.bestStreak;
+
+  renderHistory();
+  updateChart();
+  saveData();
+}
+
+// Initial load
+updateDisplay();
