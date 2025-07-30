@@ -1,0 +1,80 @@
+✅ 1. Update index.html
+Add this new button after the “Save Records” button:
+
+html
+
+<input type="file" id="loadInput" accept=".json" hidden />
+<button id="loadBtn">Load Records</button>
+Now your full button section becomes:
+
+html
+
+
+<div class="buttons">
+  <button id="madeBtn" aria-label="Log a made shot">Made Shot</button>
+  <button id="missedBtn" aria-label="Log a missed shot">Missed Shot</button>
+  <button id="resetBtn">Reset Tracker</button>
+  <button id="saveBtn">Save Records</button>
+  <input type="file" id="loadInput" accept=".json" hidden />
+  <button id="loadBtn">Load Records</button>
+</div>
+
+✅ 2. Add JavaScript Logic in script.js
+Step 1: Cache the new elements
+Add these near the top:
+
+js
+
+const loadBtn = document.getElementById('loadBtn');
+const loadInput = document.getElementById('loadInput');
+
+Step 2: Add event listener to trigger file input
+js
+
+loadBtn.addEventListener('click', () => {
+  loadInput.click();
+});
+
+Step 3: Handle the file import
+
+js
+
+loadInput.addEventListener('change', (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const importedData = JSON.parse(e.target.result);
+
+      // Optional: validate structure
+      if (
+        typeof importedData.total === 'number' &&
+        typeof importedData.made === 'number' &&
+        Array.isArray(importedData.history)
+      ) {
+        shotData = importedData;
+        saveData();       // Save to localStorage
+        updateDisplay();  // Update UI
+        alert("Shot records successfully loaded.");
+      } else {
+        alert("Invalid data format.");
+      }
+    } catch (err) {
+      alert("Failed to load data. Please make sure it's a valid JSON file.");
+    }
+  };
+  reader.readAsText(file);
+
+  // Clear input for future uploads
+  loadInput.value = '';
+});
+
+✅ Final Notes
+This will allow users to:
+
+Save their progress as a .json file
+
+Reload saved data on any device with their browser
+
